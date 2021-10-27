@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { doc, deleteDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { dbService } from '../fbInstance';
+import { deleteObject, ref } from "firebase/storage";
+import { dbService, storageService } from '../fbInstance';
 
 const Eweet = ({ eweetObj, isOwner }) => {
 	const [editing, setEditing] = useState(false);
@@ -9,6 +10,7 @@ const Eweet = ({ eweetObj, isOwner }) => {
 		const ok = window.confirm('Are you sure to delete?');
 		if (ok) {
 			await deleteDoc(doc(dbService, 'eweets', `${eweetObj.id}`));
+			await deleteObject(ref(storageService, eweetObj.attachmentUrl));
 		}
 	};
 	const onChange = (event) => {
@@ -24,7 +26,7 @@ const Eweet = ({ eweetObj, isOwner }) => {
 			await updateDoc(doc(dbService, 'eweets', `${eweetObj.id}`), {
 				text: editText,
 				edited: true,
-				editedAt: serverTimestamp()
+				editedAt: serverTimestamp(),
 			});
 		}
 		toggleEditing();
@@ -50,6 +52,7 @@ const Eweet = ({ eweetObj, isOwner }) => {
 			) : (
 				<>
 					<h4>{eweetObj.text}</h4>
+					{eweetObj.attachmentUrl && <img src={eweetObj.attachmentUrl} alt="Error" width='50px' height='50px' />}
 					{isOwner && (
 						<>
 							<button onClick={onDeleteClick}>Delete</button>
