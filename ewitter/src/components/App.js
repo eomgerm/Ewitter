@@ -13,13 +13,21 @@ function App() {
 				setUserObj(user);
 			} else {
 				setIsLoggedIn(false);
+				setUserObj(null);
 			}
 			setInit(true);
 		});
-	},[]);
+	}, []);
+	const refreshUser = () => {
+		setUserObj({...authService.currentUser});
+	};
 	return (
 		<div>
-			{init ? <AppRouter isLoggedIn={isLoggedIn} userObj={userObj} /> : 'Logging In...'}
+			{init ? (
+				<AppRouter refreshUser={refreshUser} isLoggedIn={isLoggedIn} userObj={userObj} />
+			) : (
+				'Logging In...'
+			)}
 		</div>
 	);
 }
